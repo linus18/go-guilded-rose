@@ -1,62 +1,107 @@
 package main
 
-import (
-	"fmt"
-	"testing"
+import "testing"
 
-	"github.com/stretchr/testify/assert"
+var (
+	normal    = []*Item{&items[0], &items[2]}
+	brie      = &items[1]
+	sulfuras  = &items[3]
+	backstage = &items[4]
 )
 
-func ATest_GildedRose(t *testing.T) {
-	newItem := Item{"Our new item", 0, 5}
-	//printSlice(items)
-	items = append(items, newItem)
-	//printSlice(items2)
-
-	main()
-	if items[len(items)-1].quality != 3 {
-		t.Errorf("quality should've decresed twice as fast: %d", items[len(items)-1].quality)
-	}
-	main()
-	main()
-	printSlice(items)
-	for i := 0; i < 100; i++ {
-		fmt.Printf("loop %d...", i)
-		main()
-		printSlice(items)
-	}
-}
-
-func Test_Brie(t *testing.T) {
-	var brie Item = getItemFromSlice("Aged Brie")
-
-	fmt.Println(brie)
-	assert.Equal(t, 0, brie.quality, "should be two")
-
-	main()
-
-	assert.Equal(t, 1, getItemFromSlice("Aged Brie").quality, "should be one")
-
-	main()
-
-	assert.Equal(t, 2, getItemFromSlice("Aged Brie").quality, "should be one")
-
-	main()
-
-	assert.Equal(t, 4, getItemFromSlice("Aged Brie").quality, "should be one")
-}
-
-func getItemFromSlice(itemName string) Item {
-	for i := 0; i < len(items); i++ {
-		fmt.Println(items[i].name)
-		if items[i].name == itemName {
-			return items[i]
+func TestGuildedRoseNormal(t *testing.T) {
+	for _, item := range normal {
+		t.Log(item)
+		sell := item.sellIn
+		q := item.quality
+		for i := 0; i < 1000; i++ {
+			GildedRose()
+			//update sell-in days
+			sell--
+			if item.sellIn != sell {
+				t.Errorf("sell-in was %d but should be %d", item.sellIn, sell)
+			}
+			//update expected quality
+			if item.sellIn >= 0 {
+				q--
+			} else {
+				q -= 2
+			}
+			if q < 0 {
+				q = 0
+			}
+			if item.quality != q {
+				t.Errorf("quality was %d but should be %d", item.quality, q)
+			}
 		}
-
 	}
-	return Item{"", 0, 0}
+}
+func TestGuildedRoseBrie(t *testing.T) {
+	sell := brie.sellIn
+	q := brie.quality
+	for i := 0; i < 1000; i++ {
+		GildedRose()
+		t.Log(brie)
+		//update sell-in days
+		sell--
+		if brie.sellIn != sell {
+			t.Errorf("sell-in was %d but should be %d", brie.sellIn, sell)
+		}
+		//update expected quality
+		if brie.sellIn >= 0 {
+			q++
+		} else {
+			q += 2
+		}
+		if q > 50 {
+			q = 50
+		}
+		if brie.quality != q {
+			t.Errorf("quality was %d but should be %d", brie.quality, q)
+		}
+	}
 }
 
-func printSlice(s []Item) {
-	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
+func TestGuildedRoseSulfuras(t *testing.T) {
+	sell := sulfuras.sellIn
+	q := sulfuras.quality
+	for i := 0; i < 1000; i++ {
+		GildedRose()
+		t.Log(sulfuras)
+		if sulfuras.sellIn != sell {
+			t.Errorf("sell-in was %d but should be %d", brie.sellIn, sell)
+		}
+		if sulfuras.quality != q {
+			t.Errorf("quality was %d but should be %d", sulfuras.quality, q)
+		}
+	}
+}
+func TestGuildedRoseBackstage(t *testing.T) {
+	sell := backstage.sellIn
+	q := backstage.quality
+	for i := 0; i < 1000; i++ {
+		GildedRose()
+		t.Log(backstage)
+		//update sell-in days
+		sell--
+		if backstage.sellIn != sell {
+			t.Errorf("sell-in was %d but should be %d", backstage.sellIn, sell)
+		}
+		//update expected quality
+		if backstage.sellIn > 9 {
+			q++
+		} else if backstage.sellIn > 4 {
+			q += 2
+		} else if backstage.sellIn >= 0 {
+			q += 3
+		} else {
+			q = 0
+		}
+		if q > 50 {
+			q = 50
+		}
+		if backstage.quality != q {
+			t.Errorf("quality was %d but should be %d", backstage.quality, q)
+		}
+	}
 }
