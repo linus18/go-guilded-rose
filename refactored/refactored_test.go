@@ -1,4 +1,4 @@
-package main
+package refactored
 
 import "testing"
 
@@ -7,6 +7,7 @@ var (
 	brie      = &items[1]
 	sulfuras  = &items[3]
 	backstage = &items[4]
+	conjured  = &items[5]
 )
 
 const totalIterations = 1000
@@ -63,7 +64,6 @@ func TestGuildedRoseBrie(t *testing.T) {
 		}
 	}
 }
-
 func TestGuildedRoseSulfuras(t *testing.T) {
 	sell := sulfuras.sellIn
 	q := sulfuras.quality
@@ -104,6 +104,30 @@ func TestGuildedRoseBackstage(t *testing.T) {
 		}
 		if backstage.quality != q {
 			t.Errorf("quality was %d but should be %d", backstage.quality, q)
+		}
+	}
+}
+func TestGuildedRoseConjured(t *testing.T) {
+	sell := conjured.sellIn
+	q := conjured.quality
+	for i := 0; i < totalIterations; i++ {
+		GildedRose()
+		//update sell-in days
+		sell--
+		if conjured.sellIn != sell {
+			t.Errorf("sell-in was %d but should be %d", conjured.sellIn, sell)
+		}
+		//update expected quality
+		if conjured.sellIn >= 0 {
+			q -= 2
+		} else {
+			q -= 4
+		}
+		if q < 0 {
+			q = 0
+		}
+		if conjured.quality != q {
+			t.Errorf("quality was %d but should be %d", conjured.quality, q)
 		}
 	}
 }
