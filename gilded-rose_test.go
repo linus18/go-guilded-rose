@@ -9,12 +9,14 @@ var (
 	backstage = &items[4]
 )
 
+const totalIterations = 1000
+
 func TestGuildedRoseNormal(t *testing.T) {
 	for _, item := range normal {
 		t.Log(item)
 		sell := item.sellIn
 		q := item.quality
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < totalIterations; i++ {
 			GildedRose()
 			//update sell-in days
 			sell--
@@ -39,7 +41,7 @@ func TestGuildedRoseNormal(t *testing.T) {
 func TestGuildedRoseBrie(t *testing.T) {
 	sell := brie.sellIn
 	q := brie.quality
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < totalIterations; i++ {
 		GildedRose()
 		t.Log(brie)
 		//update sell-in days
@@ -65,7 +67,7 @@ func TestGuildedRoseBrie(t *testing.T) {
 func TestGuildedRoseSulfuras(t *testing.T) {
 	sell := sulfuras.sellIn
 	q := sulfuras.quality
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < totalIterations; i++ {
 		GildedRose()
 		t.Log(sulfuras)
 		if sulfuras.sellIn != sell {
@@ -79,7 +81,7 @@ func TestGuildedRoseSulfuras(t *testing.T) {
 func TestGuildedRoseBackstage(t *testing.T) {
 	sell := backstage.sellIn
 	q := backstage.quality
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < totalIterations; i++ {
 		GildedRose()
 		t.Log(backstage)
 		//update sell-in days
