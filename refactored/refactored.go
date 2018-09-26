@@ -1,7 +1,10 @@
 package refactored
 
 import (
+	"errors"
 	"strings"
+
+	. "github.com/yanatan16/itertools"
 )
 
 type Item struct {
@@ -92,12 +95,39 @@ func factory(it Item) strategy {
 	}
 }
 
-func GildedRose(items []Item) []Item {
-	//copy
-	tmp := make([]Item, len(items))
-	for i := 0; i < len(items); i++ {
-		s := factory(items[i])
-		tmp[i] = s(items[i])
+func ConvertToGeneric(items []Item) []interface{} {
+	tmp := make([]interface{}, len(items))
+	for i := range items {
+		tmp[i] = items[i]
 	}
 	return tmp
+}
+
+func ConvertToItem(generic []interface{}) ([]Item, error) {
+	tmp := make([]Item, len(generic))
+	for i := 0; i < len(generic); i++ {
+		f, ok := (generic[i].(Item))
+		if ok {
+			tmp[i] = f
+		} else {
+			return nil, errors.New("not item")
+		}
+	}
+	return tmp, nil
+}
+
+func GildedRose(items []Item) []Item {
+
+	mapper := func(i interface{}) interface{} {
+		item, ok := (i.(Item))
+		if ok {
+			return factory(item)(item)
+		}
+		return errors.New("unknown type")
+	}
+
+	it := Map(mapper, New(ConvertToGeneric(items)...))
+
+	newItems, _ := ConvertToItem(List(it))
+	return newItems
 }
