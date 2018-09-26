@@ -18,9 +18,9 @@ var items = []Item{
 	Item{"Conjured Mana Cake", 3, 6},
 }
 
-type strategy func(it *Item)
+type strategy func(it Item) Item
 
-func Cheese(i *Item) {
+func Cheese(i Item) Item {
 	i.sellIn--
 	if i.sellIn >= 0 {
 		i.quality++
@@ -30,11 +30,12 @@ func Cheese(i *Item) {
 	if i.quality > 50 {
 		i.quality = 50
 	}
+	return i
 }
 
-func Noop(i *Item) {}
+func Noop(i Item) Item { return i }
 
-func Tics(i *Item) {
+func Tics(i Item) Item {
 	i.sellIn--
 	if i.sellIn > 9 {
 		i.quality++
@@ -48,9 +49,10 @@ func Tics(i *Item) {
 	if i.quality > 50 {
 		i.quality = 50
 	}
+	return i
 }
 
-func Conjured(i *Item) {
+func Conjured(i Item) Item {
 	i.sellIn--
 	if i.sellIn >= 0 {
 		i.quality -= 2
@@ -60,6 +62,7 @@ func Conjured(i *Item) {
 	if i.quality < 0 {
 		i.quality = 0
 	}
+	return i
 }
 
 var m = map[string]strategy{
@@ -75,7 +78,7 @@ func factory(it Item) strategy {
 			return value
 		}
 	}
-	return func(i *Item) {
+	return func(i Item) Item {
 		i.sellIn--
 		if i.sellIn >= 0 {
 			i.quality--
@@ -85,12 +88,16 @@ func factory(it Item) strategy {
 		if i.quality < 0 {
 			i.quality = 0
 		}
+		return i
 	}
 }
 
-func GildedRose() {
+func GildedRose(items []Item) []Item {
+	//copy
+	tmp := make([]Item, len(items))
 	for i := 0; i < len(items); i++ {
 		s := factory(items[i])
-		s(&items[i])
+		tmp[i] = s(items[i])
 	}
+	return tmp
 }
